@@ -4,9 +4,7 @@
 
 This repository is dedicated to managing the Lacuna project's data engineering process and data pipelines. The project aims to build a comprehensive machine-learning dataset on "Household Electricity Consumption" in Sri Lanka. The data is stored in our manifold machine within the directory `LIRNEasia/projects/lacuna/data/raw`. Access to this data is restricted to users within the LIRNEasia unix user group, which includes all members of our DAP team.
 
-![Summary of the pipeline](https://github.com/LIRNEasia/lacuna-data-pipeline/blob/main/FlowDiagram.png?raw=true)
-
-
+![Summary of the pipeline](https://github.com/LIRNEasia/lacuna-data-engineering/blob/main/FlowDiagram.png?raw=true)
 
 ## Data Storage
 
