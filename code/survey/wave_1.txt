@@ -1,11 +1,3 @@
-import polars as pl
-import pandas as pd
-import ohio as oh
-import ohio.ext.pandas as ohio
-from sqlalchemy import create_engine
-import time
-
-rename_dict = {
 'SERIALNO': '1',
 'UniqueID': '2',
 'T_PData_1': '3',
@@ -809,50 +801,3 @@ rename_dict = {
 'Generator_Battery_availability': '801',
 'Bouth_availability': '802',
 'Grill_availability': '803',
-}
-
-'''
-start_time_pd = time.time()
-leco_survey_data_raw_pd = pd.read_excel('/lirneasia/data/lacuna/raw/Survey_data/Wave1_cleaned_16_may.xlsx')
-leco_survey_data_raw_pd.columns = [colname.lower() for colname in leco_survey_data_raw_pd.columns]
-leco_survey_data_raw_pd = leco_survey_data_raw_pd.rename(rename_dict)
-engine = create_engine('postgresql://postgres:balcombe08@localhost:5432/postgres')
-leco_survey_data_raw_pd.to_sql(
-    name='survey_wave_1',
-    con = engine,
-    if_exists='replace',
-    method='multi'
-)
-print('Pandas: ' + str(time.time() - start_time_pd))
-
-
-start_time_pl = time.time()
-leco_survey_data_raw_pl = pl.read_excel('/lirneasia/data/lacuna/raw/Survey_data/Wave1_cleaned_16_may.xlsx')
-leco_survey_data_raw_pl.columns = [colname.lower() for colname in leco_survey_data_raw_pl.columns]
-leco_survey_data_raw_pl = leco_survey_data_raw_pl.rename(rename_dict)
-leco_survey_data_raw_pl.write_database(
-    table_name='survey_wave_1',
-    connection='postgresql://postgres:balcombe08@localhost:5432/postgres',
-    if_table_exists='replace'
-)
-print('Polars: ' + str(time.time() - start_time_pl))
-
-'''
-
-start_time_ohio = time.time()
-leco_survey_data_raw_ohio = pd.read_excel('/lirneasia/data/lacuna/raw/Survey_data/Wave1_cleaned_16_may.xlsx')
-leco_survey_data_raw_ohio.columns = [colname.lower() for colname in leco_survey_data_raw_ohio.columns]
-leco_survey_data_raw_ohio = leco_survey_data_raw_ohio.rename(rename_dict)
-engine = create_engine('postgresql://postgres:balcombe08@localhost:5432/postgres')
-leco_survey_data_raw_ohio.pg_copy_to(
-    name='survey_wave_1',
-    con = engine,
-    if_exists='replace'
-)
-print('Ohio: ' + str(time.time() - start_time_ohio))
-
-
-
-
-#activating .venv
-# go to /lirneasia/projects/lacuna and source .venv/bin/activate
