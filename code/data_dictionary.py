@@ -1,54 +1,47 @@
-import polars as pl
-import pandas as pd
-import ohio as oh
-import ohio.ext.pandas as ohio
-from sqlalchemy import create_engine
-import time
-
-rename_dict = {
-'SERIALNO': '1',
-'UniqueID': '2',
-'ACCOUNT_NO': '3',
-'T_PData_1': '4',
-'T_PData_2': '5',
-'T_PData_3': '6',
-'T_PData_4': '7',
-'T_PData_5': '8',
-'T_PData_6': '9',
-'T_PData_7': '10',
-'T_PData_8': '11',
-'T_PData_9': '12',
-'T_PData_10': '13',
-'T_PData_11': '14',
-'W1_Sc_0': '15',
-'W1_Sc_1': '16',
-'W1_Sc_2': '17',
+survey_wave_1 = {
+'SERIALNO': 'Survey to go serial number',
+'UniqueID': 'id created by Survey research lanka for their internal work',
+'ACCOUNT_NO': 'Customer reference number which can be used to connect the consumption data to the survey data',
+'T_PData_1': 'respondent name',
+'T_PData_2': 'respondent address',
+'T_PData_3': 'Registerd landline number of the household with the LECO database',
+'T_PData_4': 'Registerd mobile number of the household with the LECO database',
+'T_PData_5': 'Registerd SMS number of the household with the LECO database',
+'T_PData_6': 'Type of the electricity meter (Smart meter or non-smart meter)',
+'T_PData_7': 'LECO branch in which the household belongs to',
+'T_PData_8': 'LECO CSC area in which the household belongs to',
+'T_PData_9': 'LECO transformer id in which the household is connected to',
+'T_PData_10': 'longitude of the household located in',
+'T_PData_11': 'lattitude of the household located in',
+'W1_Sc_0': 'Is this premises used as a household or for a business / commercial purposes?: household - 1, Business purpose - 2',
+'W1_Sc_1': 'Are you the household head? By household head, I mean the person who makes the most important financial decisions in the house/the person who contributes to the maximum of HH day-to-day expenses: N0 - 0, Yes - 1',
+'W1_Sc_2': 'Are you able to accurately tell me about the details related to the household?: No - 0, Yes - 1',
 'W1_SCDumy_O1': '18',
 'W1_SCDumy_O2': '19',
 'W1_SCDumy_O3': '20',
-'W1_Sc_3_O1': '21',
-'W1_Sc_3_O2': '22',
-'W1_Sc_3_O3': '23',
-'W1_Sc_3_O4': '24',
+'W1_Sc_3_O1': 'First attempt that have been made to meet with this household respondent: Yes - 1',
+'W1_Sc_3_O2': 'Second attempt that have been made to meet with this household respondent: Yes - 1',
+'W1_Sc_3_O3': 'Third attempt that have been made to meet with this household respondent.: Yes - 1',
+'W1_Sc_3_O4': 'Replacement from the database: yes - 1',
 'Repla_UN': '25',
-'W1_Cs_1': '26',
-'W1_Cs_2': '27',
-'W1_EM_1': '28',
-'W1_EM_2': '29',
-'Defi': '30',
-'W1_B_1': '31',
-'W1_C_3': '32',
-'W1_C_5': '33',
-'W1_B_2': '34',
-'W1_B_5': '35',
-'W1_B_6': '36',
-'W1_B_7': '37',
-'W1_B_8': '38',
-'W1_C_1': '39',
-'W1_C_4': '40',
-'W1_C_6': '41',
-'W1_C_7': '42',
-'W1_C_8': '43',
+'W1_Cs_1': 'Do you consent to participate in this study and to provide your data to LIRNEasia?: No - 0, Yes - 1 ',
+'W1_Cs_2': 'May we audio record some parts of this interview for quality checking purposes?: No - 0, Yes - 1',
+'W1_EM_1': 'Can you please tell me how many electricity meters are there in your house?: 1 Meter - 1, 2 Meters - 2, 3 Meters - 3 (For the purpose of giving the respondent the definition of meter types and types of household coverages from those meters)',
+'W1_EM_2': 'Can you please tell me how many electricity meters are there in your house?',
+'Defi': 'Do you or any member of your household own this house or are you living on rent?: ',
+'W1_B_1': 'Do you or any member of your household own this house or are you living on rent?: Yes, I or a household member owns it - 1, No, I am living on rent and the rent is paid by me or a household member - 2, No, I am living on rent and the rent is paid by the employer - 3, No, I or any household member does not own or rent this household. We occupy this household without any payment of rent - 4',
+'W1_C_3': 'Do you occupy any of the following people in your house? By house, we mean the area covered by your electricity meter: Renters / boarders who are living in your annexe or any other attached place, maintaining separate living conditions but share the same electricity meter - 1, Boarders who live in your house using a room/s that is attached to your living conditions - 2,  I don’t occupy any of the above - 3',
+'W1_C_5': 'Which of the following best describes your awareness of the electricity consumption of renters/boarding people? Are you aware of details such as the appliances they use and the number of hours they use each appliance, the times they keep the lights and fans switched on etc.?: I know all the details about the electricity consumption of the renters/ boarders; i.e.; the appliances they use and the number of hours they use each appliance, the times they keep the lights and fans switched on etc - 1, I know some details about the electricity consumption of the renters/ boarders; i.e.; the appliances they use and the number of hours they use each appliance, the times they keep the lights and fans switched on etc - 2, I do not know any details about the electricity consumption of the renters/ boarders; i.e.; the appliances they use and the number of hours they use each appliance, the times they keep the lights and fans switched on etc. - 3',
+'W1_B_2': 'Which of the following time periods best describes when your house was built? Knowing when the house was built will help us to understand whether there’s any difference in older homes and newly built homes with regard to electricity consumption. for example, compared to a household built before 1980, a household built recently may use different techniques, improved material etc., which will help reduce energy consumption. Before 1980 - 1, 1980-1989 - 2, 1990-1999 - 3, 2000-2009 - 4, 2010-2019 - 5, In 2020 or After 2020 - 6, Don’t know - 7',
+'W1_B_5': 'Select the best option which describes your house: Single House - Single Floor - 1, Single House -Double Floor, Single House – More than 2 floors - 3, Attached house / Annex - 4, Flat - 5, Condominium/ Luxury apartments - 6, Twin houses - 7, Line room/row house - 8, Slum / Shanty - 9, Other - 10 ',
+'W1_B_6': 'What floor is your house located on? (if the house occupies multiple floors, answer should be the lowest floor)',
+'W1_B_7': 'How many storeys does your house have?',
+'W1_B_8': 'Can you please tell me what is the floor area of this household? i.e.; how many square feet does this household cover? Please remember, when we say household, what we mean is the parts of the household that is covered by the electricity meter',
+'W1_C_1': 'No. of household members',
+'W1_C_4': 'You mentioned that there are renters or boarders living in this household who share the same electricity meter. Which of the following best describes how you charge them for electricity? You charge a fixed amount every month for electricity - 1, You charge an amount for electricity depending on the variance of the bill - 2, You dont charge a specific amount for electricity but charge a fixed amount for all the utilities such as electricity, water etc - 3, You dont charge a specific amount for electricity but charge a varied amount for all the utilities such as electricity, water etc. The amount charged varied based on the utility bills, - 4, You dont charge them for electricity consumption - 5',
+'W1_C_6': 'You mentioned that you are living on rent. Which of the following best describes the payment for your electricity consumption? 1.	You pay the full amount of the electricity bill. 2.	You pay a fixed amount to the owner every month for electricity. 3.	You pay a varied amount to the owner every month for electricity. The amount paid varies depending on the variance of the bill. 4.	You dont pay a specific amount for electricity, but pay a fixed amount for all the utilities such as electricity, water etc. 5.	You dont pay a specific amount for electricity, but pay a varied amount for all the utilities such as electricity, water etc. The amount paid varies depending on the variance of the utility bill. 6.	You don’t pay the owner for electricity consumption',
+'W1_C_7': 'Is there any business activity that is being carried out in any part of this household such as a shop, a communication, your own office etc. for which, electricity is used from the same meter? 1.	Yes 0.	No  ',
+'W1_C_8': 'What type of business activity is being carried out in this household? 1.	A shop 2.	A communication  3.	Other (specify) ',
 'Time1': '44',
 'W1_D1_O1': '45',
 'W1_D1_O2': '46',
@@ -596,10 +589,10 @@ rename_dict = {
 'T_W1_D3_77_3': '588',
 'T_W1_D3_77_4': '589',
 'T_W1_D3_77_5': '590',
-'W1_E_1_a': '591',
-'W1_E_1_b': '592',
-'W1_E_2': '593',
-'W1_E_3': '594',
+'W1_E_1_a': 'removed question',
+'W1_E_1_b': 'removed question',
+'W1_E_2': 'What is the main material used to build the outside walls of your house?: 1. Brick, 2. Cement block, 3. Stones/Cube stones, 4. Cabook, 5. Pressed soil blocks, 6. Cadjan / palmyra, 7. Wood / Takaran/ Asbastos, 8. Metal sheet, 9. Mud, 10. Other, 11. I am not aware of that',
+'W1_E_3': 'removed question',
 'T_W1_E_5_1': '595',
 'T_W1_E_5_2': '596',
 'T_W1_E_5_3': '597',
@@ -812,50 +805,3 @@ rename_dict = {
 'Grill_availability': '804',
 'LA_Unique_ID': '805',
 }
-
-'''
-start_time_pd = time.time()
-leco_survey_data_raw_pd = pd.read_excel('/lirneasia/data/lacuna/raw/Survey_data/Wave1_cleaned_16_may.xlsx')
-leco_survey_data_raw_pd.columns = [colname.lower() for colname in leco_survey_data_raw_pd.columns]
-leco_survey_data_raw_pd = leco_survey_data_raw_pd.rename(rename_dict)
-engine = create_engine('postgresql://postgres:balcombe08@localhost:5432/postgres')
-leco_survey_data_raw_pd.to_sql(
-    name='survey_wave_1',
-    con = engine,
-    if_exists='replace',
-    method='multi'
-)
-print('Pandas: ' + str(time.time() - start_time_pd))
-
-
-start_time_pl = time.time()
-leco_survey_data_raw_pl = pl.read_excel('/lirneasia/data/lacuna/raw/Survey_data/Wave1_cleaned_16_may.xlsx')
-leco_survey_data_raw_pl.columns = [colname.lower() for colname in leco_survey_data_raw_pl.columns]
-leco_survey_data_raw_pl = leco_survey_data_raw_pl.rename(rename_dict)
-leco_survey_data_raw_pl.write_database(
-    table_name='survey_wave_1',
-    connection='postgresql://postgres:balcombe08@localhost:5432/postgres',
-    if_table_exists='replace'
-)
-print('Polars: ' + str(time.time() - start_time_pl))
-
-'''
-
-start_time_ohio = time.time()
-leco_survey_data_raw_ohio = pd.read_csv('/lirneasia/data/lacuna/raw/Survey_data/Survey_wave_1_may_29.csv')
-leco_survey_data_raw_ohio.columns = [colname.lower() for colname in leco_survey_data_raw_ohio.columns]
-#leco_survey_data_raw_ohio = leco_survey_data_raw_ohio.rename(rename_dict)
-engine = create_engine('postgresql://postgres:balcombe08@localhost:5432/lacuna')
-leco_survey_data_raw_ohio.pg_copy_to(
-    name='survey_wave_1',
-    con = engine,
-    schema='raw',
-    if_exists='replace'
-)
-print('Ohio: ' + str(time.time() - start_time_ohio))
-
-
-
-
-#activating .venv
-# go to /lirneasia/projects/lacuna and source .venv/bin/activate

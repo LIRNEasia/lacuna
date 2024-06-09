@@ -6,12 +6,29 @@
 # environment variable for session
 export PGPASSWORD='balcombe08'
 
-# Modify and execute the SQL script
-psql -U postgres -h localhost -d postgres -a -f "/lirneasia/projects/lacuna/data/z_codes_power_consumption/sm/power_consumption_sm_data.sql"
+# Modify and execute the SQL script to create raw sm table
+#psql -U postgres -h localhost -d lacuna -a -f "/lirneasia/projects/lacuna/code/power_consumption/sm/sm_raw.sql"
 
 
+DATA_DIR="/lirneasia/data/lacuna/processed/sm_april_2024_dump"
 
-# Load data from CSV to the database
-psql -U postgres -h localhost -d postgres -c "\\copy power_consumption_sm (\"SERIAL\", \"CUSTOMER_REF\", \"TIMESTAMP\", \"OBIS\", \"DATE\", \"TIME\", \"IMPORT_KWH (kWh)\", \"EXPORT_KWH (kWh)\", \"IMPORT_KVARH (kvarh)\", \"EXPORT_KVARH (kvarh)\", \"PHASE_A_INST._CURRENT (A)\", \"PHASE_B_INST._CURRENT (A)\", \"PHASE_C_INST._CURRENT (A)\", \"PHASE_A_INST._VOLTAGE (V)\", \"PHASE_B_INST._VOLTAGE (V)\", \"PHASE_C_INST._VOLTAGE (V)\", \"POWER_FACTOR\", \"AVG._IMPORT_KW (kW)\", \"AVG._EXPORT_KW (kW)\", \"AVG._IMPORT_KVA (kVA)\", \"AVG._EXPORT_KVA (kVA)\", \"AVG._CURRENT (V)\", \"AVG._VOLTAGE (V)\") from '/lirneasia/projects/lacuna/data/raw/Leco_data/First 500/1/LOAD_PROFILE_HISTORICAL_READINGS_INVENTORY_17_04_2024.csv' WITH DELIMITER ',' csv header;"
- 
+# Load data from CSV to the database to raw sm
+#psql -U postgres -h localhost -d lacuna -c "\\copy raw.power_consumption_sm (\"serial\", \"customerref\", \"timestamp\", \"obis\", \"date\", \"time\", \"importkwh(kwh)\", \"exportkwh(kwh)\", \"importkvarh(kvarh)\", \"exportkvarh(kvarh)\", \"phaseainstcurrent(a)\", \"phasebinstcurrent(a)\", \"phasecinstcurrent(a)\", \"phaseainstvoltage(v)\", \"phasebinstvoltage(v)\", \"phasecinstvoltage(v)\", \"powerfactor\", \"avgimportkw(kw)\", \"avgexportkw(kw)\", \"avgimportkva(kva)\", \"avgexportkva(kva)\", \"avgcurrent(v)\", \"avgvoltage(v)\") from '/lirneasia/data/lacuna/processed/sm_april_2024_dump/3LOAD_PROFILE_HISTORICAL_READINGS_INVENTORY_17_04_2024.csv' WITH DELIMITER ',' csv header;"
+
+#for file in "$DATA_DIR"/*.csv; do
+    # Execute the psql command for each file
+#    psql -U postgres -h localhost -d lacuna -c "\\copy raw.power_consumption_sm (\"serial\", \"customerref\", \"timestamp\", \"obis\", \"date\", \"time\", \"importkwh(kwh)\", \"exportkwh(kwh)\", \"importkvarh(kvarh)\", \"exportkvarh(kvarh)\", \"phaseainstcurrent(a)\", \"phasebinstcurrent(a)\", \"phasecinstcurrent(a)\", \"phaseainstvoltage(v)\", \"phasebinstvoltage(v)\", \"phasecinstvoltage(v)\", \"powerfactor\", \"avgimportkw(kw)\", \"avgexportkw(kw)\", \"avgimportkva(kva)\", \"avgexportkva(kva)\", \"avgcurrent(v)\", \"avgvoltage(v)\") FROM '$file' WITH DELIMITER ',' CSV HEADER;"
+#done
+
+
+# Execute creating clean schema power consumption sm table
+#psql -U postgres -h localhost -d lacuna -a -f "/lirneasia/projects/lacuna/code/power_consumption/sm/sm_cleaned.sql"
+
+#Excute transfering data from raw to cleaned 
+#psql -U postgres -h localhost -d lacuna -a -f "/lirneasia/projects/lacuna/code/power_consumption/sm/sm_raw_to_clean.sql"
+
+
+#Executing relevant sql statements
+psql -U postgres -h localhost -d lacuna -a -f "/lirneasia/projects/lacuna/code/power_consumption/sm/relavent_sql_statements.sql"
+
 # to run the pipeline.sh file -> ./pipeline.sh
