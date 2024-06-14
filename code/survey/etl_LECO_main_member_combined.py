@@ -5,12 +5,11 @@ import ohio.ext.pandas as ohio
 from sqlalchemy import create_engine
 import time
 
-rename_dict = {'final_account_number':'1',
-'serialno':'Serial_Number',
-'memberserial':'Member_Serial',
-'a_9':'A_9_Date',
-'a_10_a':'A_10_a_time',
-'selection':'Selection',
+rename_dict = {
+'SERIALNO': 'serialno',
+'UniqueID': 'srl_unique_id',
+'ACCOUNT_NO': 'customerref',
+'T_PData_1': 'respondent name',
 'a4_1':'LECO_ID',
 't_listdata_9':'Name',
 't_listdata_1':'Address_1',
