@@ -7,7 +7,7 @@ export PGPASSWORD='balcombe08'
 /home/manifold/.pyenv/versions/3.8.10/bin/python /lirneasia/projects/lacuna/code/power_consumption/sm/field_cleaner.py
 
 # Modify and execute the SQL script to create raw sm table
-#psql -U postgres -h localhost -d lacuna -a -f "/lirneasia/projects/lacuna/code/power_consumption/sm/sm_raw.sql"
+psql -U postgres -h localhost -d lacuna -a -f "/lirneasia/projects/lacuna/code/power_consumption/sm/sm_raw.sql"
 
 
 DATA_DIR="/lirneasia/data/lacuna/processed/sm_april_2024_dump"
